@@ -7,173 +7,166 @@ given_tasks = ['Adjust engine output', 'Calibrate distributor',
 'Fill engines tanks', 'Inspect laboratory', 'Move shields', 'Steady steering', 'Initiate reactor', 'Submit personal info', 
 'Sign in with ID', 'Enable manifolds', 'Sync data']
 
-class Character:
+class Character():
     '''
-    Purpose: A character in a player elimination game
-    Instance variables:
-        self.name: character's name
-        color: character's color
-        hat: type of hat
-        num_tasks: number of tasks
-        status: character's health status
-        task_list: list of tasks
-    Methods:
+    Purpose: A character in a social deduction game
+    Instance variables: 
+        self.name: name of the character, 
+        color: color of the character, 
+        hat: type of hat, 
+        status: health status of player, which can be 'Ghost' or 'Alive',
+        task_list: the list of tasks for a character
+    and what does each represent in a few words?)
+    Methods: 
         __init__: initializes instance variables
-        repr(): returns character status
+        repr(): returns the brief status for a character character
         get_identity(): returns 'Character'
     '''
-
-
-    def __init__(self, name, color, hat, num_tasks):
+    def __init__(self,name,color,hat,num_tasks):
         self.name = name
         self.color = color
         self.hat = hat
-        self.num_tasks = num_tasks
         self.status = True
         self.task_list = random.sample(given_tasks, num_tasks)
-    
     def __repr__(self):
-        if self.status:
-            status = 'Alive'
-        else:
-            status = 'Ghost'
-        return(self.name + ': ' + self.color + ', wearing a ' + self.hat + ' - Health status: ' + status)
-
+        status = 'Alive' if self.status else 'Ghost'
+        return '{}: {}, wearing a {} - Health status: {}'.format(self.name, self.color, self.hat, status)
     def get_identity(self):
         return 'Character'
 
 class Crewperson(Character):
     '''
-    Purpose: specific methods for a crew person type character
+    Purpose: inherited class of character with specialized methods for a crew person
     Instance variables: 
-        self.name: character's name
-        color: character's color
-        hat: type of hat
-        num_tasks: number of tasks
-        task_list: list of tasks
+        self.name: name of the crew person, 
+        color: color of the crew person, 
+        hat: type of hat, 
+        status: health status of player, which can be 'Ghost' or 'Alive',
+        task_list: the list of tasks for the crew person
     Methods: 
-        __init__: initializes instance variables
-        get_identity(): returns 'Crewperson'
-        complete_task(): completes tasks
+    __init__(): initializes instance variables,
+    get_identity(): returns identity 'Crewperson'
+    complete_task(): completing a task 
     '''
-    def __init__(self, name, color, hat, num_tasks):
+    def __init__(self,name,color,hat,num_tasks):
         Character.__init__(self, name, color, hat, num_tasks)
-    
     def get_identity(self):
         return 'Crewperson'
-    
     def complete_task(self):
-        if len(self.task_list) != 1:
-            print(self.name + ' has completed the ' + self.task_list[0] + ' task.')
-            self.task_list.remove(self.task_list[0])
-        else:
-            self.task_list.remove(self.task_list[0])
-            print(self.name + ' has completed all their tasks.')
+        if self.task_list == []:
+            print('{} has completed all their tasks'.format(self.name))
+            return 
+
+        print('{} completed the {} task.'.format(self.name, self.task_list[0]))
+        self.task_list.pop(0)
 
 class Pretender(Character):
     '''
-    Purpose: specific methods for a pretender type character
+    Purpose: inherited class of character with specialized methods for a pretender
     Instance variables: 
-        self.name: character's name
-        color: character's color
-        hat: type of hat
-        status: character's health status
-        task_list: list of tasks
+        self.name: name of the pretender, 
+        color: color of the pretender, 
+        hat: type of hat, 
+        status: health status of player, which can be 'Ghost' or 'Alive',
+        task_list: list of tasks for the pretender
     Methods: 
-        __init__: initializes instance variables
-        get_identity(): returns 'Pretender'
-        eliminate(self, target): eliminates target
+    __init__(): initializes instance variables,
+    get_identity(): returns identity 'Pretender',
+    eliminate(self, target): eliminates a target 
     '''
-    def __init__(self, name, color, hat, num_tasks):
-        Character.__init__(self, name, color, hat, num_tasks)
+    def __init__(self,name,color,hat,num_tasks):
+        Character.__init__(self,name,color,hat,num_tasks)
     def get_identity(self):
         return 'Pretender'
-    
     def eliminate(self, target):
         target.status = False
-        print(self.name + ' eliminated ' + target.name)
+        print('{} eliminated {}.'.format(self.name, target.name))
+
+
+# cp = Crewperson("Zaela", "White", "party hat", 4)
+# print(cp.task_list)
+# cp.complete_task()
+# print(cp.task_list)
+# cp = Crewperson("Greta", "Brown", "lab goggles", 4)
+# pt = Pretender("Rachel", "Pink", "sticky note", 4)
+# print(pt.name, pt.status, pt.get_identity(), pt.color, pt.hat)
 
 class Game():
     '''
-    Purpose: plays character elimination game
+    Purpose: play a game of social deduction
     Instance variables: 
-        self.player_list: player objects list
+        self.player_list: list of player objects
     Methods: 
-        __init__(): initializes instance variables
-        check_winner(): checks if there is a winner
-        meeting(): creates meeting for characters to vote on one character to eliminate
-        play_game(): play game
+    __init__(): initializes instance variables,
+    check_winner(): checks the winner of the game,
+    meeting(): a meeting for players to vote who to eliminate
+    play_game(): play the Game. 
     '''
-    def __init__(self, player_list):
+    def __init__(self,player_list):
         self.player_list = player_list
-    
     def check_winner(self):
-        lstof_pretenders = []
-        lstof_crewpersons = []
-        crew_alive = 0
-        pret_alive = 0
-        for player in self.player_list:
-            if player.get_identity() == 'Crewperson':
-                lstof_crewpersons.append(player)
-            else:
-                lstof_pretenders.append(player)
+        crew_people = [x for x in self.player_list if x.get_identity() == 'Crewperson']
+        pretenders = [x for x in self.player_list if x.get_identity() == 'Pretender']
+        crew_people_alive = 0
+        pretenders_alive = 0
+        # for player in self.player_list:
+        #     if player.get_identity() == 'Crewperson':
+        #         crew_people.append(player)
+        #     else:
+        #         pretenders.append(player)
+        for cp in crew_people:
+            if cp.status:
+                crew_people_alive+=1
+        for pt in pretenders:
+            if pt.status:
+                pretenders_alive+=1
 
-        for c in lstof_crewpersons:
-            if c.status:
-                crew_alive += 1
-        for p in lstof_pretenders:
-            if p.status:
-                pret_alive += 1
-        
-        completed_tasks = all(len(c.task_list) == 0 for c in lstof_crewpersons)
-        pret_dead = all(p.status == False for p in lstof_pretenders)
-
-        if completed_tasks or pret_dead:
+        #check if crew people won        
+        cp_tasks_complete = all(len(cp.task_list) == 0 for cp in crew_people) # T/F
+        pretenders_eliminated = all(p.status == False for p in pretenders) # T/F
+        if cp_tasks_complete or pretenders_eliminated:
             print('Crewpersons win!')
-            return('C')
-        elif pret_alive >= crew_alive:
+            return 'C'
+        #check if pretenders won
+        elif pretenders_alive >= crew_people_alive:
             print('Pretenders win!')
-            return('P')
-        elif (completed_tasks or pret_dead) and (pret_alive >= crew_alive):
+            return 'P'
+        #check if crew people won
+        elif (cp_tasks_complete or pretenders_eliminated) and (pretenders_alive >= crew_people_alive):
             print('Crewpersons win!')
-            return('C')
+            return 'C'
         else:
-            return('-')
-
+            return '-' 
     def meeting(self):
-        alive_players = []
-        for player in self.player_list:
-          if player.status:
-            alive_players.append(player)
+        vote_dict = {}
+        alive = [x for x in self.player_list if x.status]
+        print(self.player_list)
+        for current_player in alive:
+            rand_player = random.choice([x for x in alive if x != current_player]) # chooses anyone but the current person
+            print('{} voted for {}'.format(current_player.name, rand_player.name))
+            vote_dict[rand_player.name] = vote_dict.get(rand_player.name, 0) + 1
 
-        meetingTarget = random.choice(alive_players)
+        most_voted = max(vote_dict, key=vote_dict.get)
+        most_voted_list = [x for x, p in vote_dict.items() if p == vote_dict[most_voted]] # puts the most voted people with the same value in a list
 
-        for player in alive_players:
-            print(player.name + ' voted for ' + meetingTarget.name)
-        print(meetingTarget.name + ' was eliminated.')
-        meetingTarget.status = False
+        if len(most_voted_list) == 1: # if there is only one most voted person
+            print('{} was elminated'.format(most_voted))
+            person = [x for x in alive if x.name == most_voted_list[0]] # find the most voted person
+            person[0].status = False
+            return person[0].name
+        elif len(most_voted_list) > 1: # two or more with the same highest number of votes
+            print('Nobody was eliminated')
 
-    def play_game(self):
-      
-        flag = False
-      
-        while flag is False:
-            for player in self.player_list:
-                if player.get_identity() == 'Crewperson':
-                    player.complete_task()
-                elif player.get_identity() == 'Pretender' and player.status is True:
-                    random_target = random.choice(self.player_list)
-                    player.eliminate(random_target)
-                
-            
-            if self.check_winner() == 'C':
-                return self.check_winner()
-            elif self.check_winner() == 'P':
-                return self.check_winner()
-            else:
-                self.meeting()
+p_list = [Pretender("Jerry", "Blue", "mohawk", 4),
+              Crewperson("Jackson", "Orange", "bird nest", 4),
+              Crewperson("Yuchen", "Purple", "witch hat", 4),
+              Crewperson("Zaela", "White", "party hat", 4),
+              Crewperson("Audrey", "Lime", "wet floor sign", 4),
+              Crewperson("Rachel", "Pink", "sticky note", 4),
+              Crewperson("Nikhil", "Cyan", "pirate hat", 4),
+              Pretender("Julia", "Yellow", "green fedora", 4),
+              Crewperson("Greta", "Brown", "lab goggles", 4),
+              Crewperson("Nate", "Red", "banana peel", 4)]
+g = Game(p_list)
 
-            if self.check_winner() == 'C':
-                return self.check_winner()
-            elif self.check_winner() == 'P':
-                return self.check_winner()
+print(g.meeting())
