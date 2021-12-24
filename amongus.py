@@ -168,5 +168,3 @@ p_list = [Pretender("Jerry", "Blue", "mohawk", 4),
               Crewperson("Greta", "Brown", "lab goggles", 4),
               Crewperson("Nate", "Red", "banana peel", 4)]
 g = Game(p_list)
-
-print(g.meeting())
